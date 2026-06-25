@@ -1,0 +1,22 @@
+{% extends 'assignments/base.html' %}
+
+{% block title %}{{ course.name }} - Assignments{% endblock %}
+
+{% block content %}
+    <h1>{{ course.name }} - Assignments</h1>
+    <p><a href="{% url 'assignments:dashboard' %}" class="btn">← Back to Dashboard</a></p>
+
+    <div class="grid">
+        {% for assignment in assignments %}
+            <div class="assignment-card">
+                <h3><a href="{% url 'assignments:assignment_detail' assignment.id %}">{{ assignment.title }}</a></h3>
+                <p>{{ assignment.description|truncatewords:20 }}</p>
+                <p class="due">Due: {{ assignment.due_date|date:"M d, Y H:i" }}</p>
+                <span class="badge badge-{{ assignment.status }}">{{ assignment.status }}</span>
+                <a href="{% url 'assignments:assignment_detail' assignment.id %}" class="btn">View</a>
+            </div>
+        {% empty %}
+            <p>No assignments published yet.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

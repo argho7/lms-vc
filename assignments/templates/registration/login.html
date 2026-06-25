@@ -1,0 +1,15 @@
+{% extends 'assignments/base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+    <div class="card" style="max-width: 400px; margin: 50px auto;">
+        <h2>Login</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn">Login</button>
+        </form>
+        <p style="margin-top: 10px;">Don't have an account? Contact your teacher.</p>
+    </div>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'assignments/base.html' %}
+
+{% block title %}Submit: {{ assignment.title }}{% endblock %}
+
+{% block content %}
+    <h1>Submit: {{ assignment.title }}</h1>
+    <p><a href="{% url 'assignments:assignment_detail' assignment.id %}" class="btn">← Back</a></p>
+
+    <div class="card">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-success">Submit</button>
+        </form>
+        <p style="margin-top: 15px; color: #666; font-size: 14px;">
+            You can either upload a file OR write your answer in the text box.
+        </p>
+    </div>
+{% endblock %}

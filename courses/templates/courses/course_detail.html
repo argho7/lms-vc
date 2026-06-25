@@ -1,0 +1,125 @@
+{% extends 'assignments/base.html' %}
+
+{% block title %}{{ course.title }} - LMS{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Course Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{{ course.title }}</h1>
+            <p class="text-muted">
+                By {{ course.teacher.get_full_name|default:course.teacher.username }}
+            </p>
+            <div class="mb-2">
+                <span class="badge bg-info">{{ course.get_level_display }}</span>
+                <span class="badge bg-warning">{{ course.duration }} hours</span>
+                <span class="badge bg-secondary">{{ course.category }}</span>
+            </div>
+            <p>{{ course.description|linebreaks }}</p>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    {% if course.thumbnail %}
+                        <img src="{{ course.thumbnail.url }}" class="img-fluid mb-3" alt="{{ course.title }}">
+                    {% endif %}
+                    
+                    <h4 class="text-center">
+                        {% if course.is_free %}
+                            <span class="text-success">Free</span>
+                        {% else %}
+                            <span class="text-danger">${{ course.price }}</span>
+                        {% endif %}
+                    </h4>
+                    
+                    <p class="text-center text-muted">
+                        {{ enrollment_count }} students enrolled
+                    </p>
+                    
+                    {% if user.is_authenticated %}
+                        {% if is_enrolled %}
+                            <div class="alert alert-success">
+                                ✅ You are enrolled in this course
+                            </div>
+                            <a href="{% url 'courses:course_progress' course.id %}" class="btn btn-primary w-100">
+                                Continue Learning
+                            </a>
+                        {% else %}
+                            {% if course.is_free %}
+                                <form action="{% url 'courses:enroll_free' course.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success w-100">
+                                        Enroll Now (Free)
+                                    </button>
+                                </form>
+                            {% else %}
+                                <a href="{% url 'payments:checkout' course.id %}" class="btn btn-warning w-100">
+                                    Enroll Now - ${{ course.price }}
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn btn-primary w-100">
+                            Login to Enroll
+                        </a>
+                        <p class="text-center mt-2">
+                            <a href="{% url 'accounts:register' %}">Create an account</a>
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Content -->
+    <div class="row">
+        <div class="col-12">
+            <h3>Course Content</h3>
+            <div class="accordion" id="courseAccordion">
+                {% for module in modules %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" 
+                                    type="button" 
+                                    data-bs-toggle="collapse" 
+                                    data-bs-target="#collapse{{ module.id }}">
+                                {{ module.title }}
+                            </button>
+                        </h2>
+                        <div id="collapse{{ module.id }}" 
+                             class="accordion-collapse collapse {% if forloop.first %}show{% endif %}"
+                             data-bs-parent="#courseAccordion">
+                            <div class="accordion-body">
+                                {% if module.description %}
+                                    <p>{{ module.description }}</p>
+                                {% endif %}
+                                
+                                <ul class="list-group">
+                                    {% for lesson in module.lessons.all %}
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span>
+                                                {{ lesson.title }}
+                                                {% if lesson.is_free_preview %}
+                                                    <span class="badge bg-info">Preview</span>
+                                                {% endif %}
+                                            </span>
+                                            <span class="badge bg-secondary rounded-pill">
+                                                {{ lesson.duration }} min
+                                            </span>
+                                        </li>
+                                    {% empty %}
+                                        <li class="list-group-item">No lessons yet.</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p>No modules available for this course.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

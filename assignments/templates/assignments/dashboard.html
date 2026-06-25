@@ -1,0 +1,49 @@
+{% extends 'assignments/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <h1>Dashboard</h1>
+
+    <h2>📖 Enrolled Courses</h2>
+    <div class="grid">
+        {% for course in enrolled_courses %}
+            <div class="card">
+                <h3>{{ course.name }}</h3>
+                <p>{{ course.description|truncatewords:20 }}</p>
+                <p><strong>Teacher:</strong> {{ course.teacher.username }}</p>
+                <a href="{% url 'assignments:assignment_list' course.id %}" class="btn">View Assignments</a>
+            </div>
+        {% empty %}
+            <p>You are not enrolled in any courses.</p>
+        {% endfor %}
+    </div>
+
+    <h2>👨‍🏫 Courses I Teach</h2>
+    <div class="grid">
+        {% for course in teaching_courses %}
+            <div class="card">
+                <h3>{{ course.name }}</h3>
+                <p>{{ course.description|truncatewords:20 }}</p>
+                <p><strong>Students:</strong> {{ course.students.count }}</p>
+                <a href="{% url 'assignments:assignment_list' course.id %}" class="btn">Manage</a>
+            </div>
+        {% empty %}
+            <p>You are not teaching any courses.</p>
+        {% endfor %}
+    </div>
+
+    <h2>📝 Upcoming Assignments</h2>
+    <div class="grid">
+        {% for assignment in upcoming_assignments %}
+            <div class="assignment-card">
+                <h3><a href="{% url 'assignments:assignment_detail' assignment.id %}">{{ assignment.title }}</a></h3>
+                <p>{{ assignment.course.name }}</p>
+                <p class="due">Due: {{ assignment.due_date|date:"M d, Y H:i" }}</p>
+                <a href="{% url 'assignments:assignment_detail' assignment.id %}" class="btn">View</a>
+            </div>
+        {% empty %}
+            <p>No upcoming assignments.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

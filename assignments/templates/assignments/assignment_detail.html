@@ -1,0 +1,37 @@
+{% extends 'assignments/base.html' %}
+
+{% block title %}{{ assignment.title }}{% endblock %}
+
+{% block content %}
+    <h1>{{ assignment.title }}</h1>
+    <p><a href="{% url 'assignments:assignment_list' assignment.course.id %}" class="btn">← Back to Assignments</a></p>
+
+    <div class="card">
+        <p><strong>Course:</strong> {{ assignment.course.name }}</p>
+        <p><strong>Due:</strong> {{ assignment.due_date|date:"M d, Y H:i" }}</p>
+        <p><strong>Status:</strong> <span class="badge badge-{{ assignment.status }}">{{ assignment.status }}</span></p>
+        <p><strong>Max Score:</strong> {{ assignment.max_score }}</p>
+        <hr>
+        <p>{{ assignment.description|linebreaks }}</p>
+    </div>
+
+    {% if has_submitted %}
+        <div class="submitted-status">
+            ✅ You have submitted this assignment on {{ submission.submitted_at|date:"M d, Y H:i" }}.
+            {% if submission.score is not None %}
+                <p><strong>Score:</strong> {{ submission.score }}/{{ assignment.max_score }}</p>
+            {% endif %}
+            {% if submission.feedback %}
+                <p><strong>Feedback:</strong> {{ submission.feedback }}</p>
+            {% endif %}
+        </div>
+    {% else %}
+        {% if assignment.status == 'published' and not assignment.is_overdue %}
+            <a href="{% url 'assignments:submit_assignment' assignment.id %}" class="btn btn-success">Submit Assignment</a>
+        {% elif assignment.is_overdue %}
+            <p class="error">⚠️ This assignment is overdue. Submissions are closed.</p>
+        {% else %}
+            <p>This assignment is not yet open for submissions.</p>
+        {% endif %}
+    {% endif %}
+{% endblock %}

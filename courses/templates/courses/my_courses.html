@@ -1,0 +1,45 @@
+{% extends 'assignments/base.html' %}
+
+{% block title %}My Courses - LMS{% endblock %}
+
+{% block content %}
+<h1>My Courses</h1>
+
+<div class="row mt-4">
+    {% for item in courses %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                {% if item.course.thumbnail %}
+                    <img src="{{ item.course.thumbnail.url }}" class="card-img-top" alt="{{ item.course.title }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.course.title }}</h5>
+                    <p class="card-text">{{ item.course.description|truncatewords:20 }}</p>
+                    
+                    <!-- Progress Bar -->
+                    <div class="progress mb-2">
+                        <div class="progress-bar" role="progressbar" 
+                             style="width: {{ item.progress }}%;" 
+                             aria-valuenow="{{ item.progress }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                            {{ item.progress }}%
+                        </div>
+                    </div>
+                    
+                    <a href="{% url 'courses:course_detail' item.course.id %}" class="btn btn-primary">
+                        Continue
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                You haven't enrolled in any courses yet.
+                <a href="{% url 'courses:course_list' %}" class="alert-link">Browse courses</a>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

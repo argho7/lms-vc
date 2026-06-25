@@ -1,0 +1,79 @@
+{% extends 'assignments/base.html' %}
+
+{% block title %}Courses - LMS{% endblock %}
+
+{% block content %}
+<h1>All Courses</h1>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control" 
+                       placeholder="Search courses..." value="{{ search_query }}">
+            </div>
+            <div class="col-md-3">
+                <select name="category" class="form-select">
+                    <option value="">All Categories</option>
+                    {% for key, value in categories %}
+                        <option value="{{ key }}" {% if key == current_category %}selected{% endif %}>
+                            {{ value }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="level" class="form-select">
+                    <option value="">All Levels</option>
+                    {% for key, value in levels %}
+                        <option value="{{ key }}" {% if key == current_level %}selected{% endif %}>
+                            {{ value|title }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    {% for course in courses %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                {% if course.thumbnail %}
+                    <img src="{{ course.thumbnail.url }}" class="card-img-top" alt="{{ course.title }}" style="height: 200px; object-fit: cover;">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ course.title }}</h5>
+                    <p class="card-text">{{ course.description|truncatewords:20 }}</p>
+                    <p>
+                        <span class="badge bg-info">{{ course.get_level_display }}</span>
+                        <span class="badge bg-warning">{{ course.duration }} hours</span>
+                    </p>
+                    <p class="h5">
+                        {% if course.is_free %}
+                            <span class="text-success">Free</span>
+                        {% else %}
+                            <span class="text-danger">${{ course.price }}</span>
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'courses:course_detail' course.id %}" class="btn btn-primary">View Course</a>
+                </div>
+                <div class="card-footer text-muted">
+                    By {{ course.teacher.get_full_name|default:course.teacher.username }}
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                No courses found. Check back later!
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
